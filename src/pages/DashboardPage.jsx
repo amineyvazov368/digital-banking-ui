@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import accountService from '../services/accountService';
 import transactionService from '../services/transactionService';
 import cardService from '../services/cardService';
-import { useNotification } from '../context/NotificationContext'; // Context-i bura daxil edirik
+import { useNotification } from '../context/NotificationContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 import {
   Search,
@@ -11,8 +11,6 @@ import {
   User,
   LogOut,
   History,
-  QrCode,
-  LayoutGrid,
   Send,
   CreditCard,
   PlusCircle
@@ -20,35 +18,12 @@ import {
 
 export const DashboardPage = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { unreadCount } = useNotification(); // Context-dən oxunmamış bildiriş sayını götürürük
+  const { unreadCount } = useNotification();
+  
   const [cards, setCards] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
-  const getUserId = () => {
-    const token = localStorage.getItem('banking_token') || localStorage.getItem('token');
-    if (token) {
-      try {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(
-          atob(base64)
-            .split('')
-            .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-            .join('')
-        );
-        const decoded = JSON.parse(jsonPayload);
-        return decoded.userId || decoded.id || decoded.sub;
-      } catch (e) {
-        console.error("Token parse xətası:", e);
-      }
-    }
-    return null;
-  };
-
-  const userId = getUserId();
 
   useEffect(() => {
     const handleResize = () => {
@@ -70,22 +45,27 @@ export const DashboardPage = () => {
           console.warn("Kart servisi xətası:", cardErr);
         }
 
-        // 2. Hər bir kartın aid olduğu hesab məlumatını (balansını) çəkirik
+        // 2. Hesab məlumatlarını və balansları sinxronlaşdırırıq
         let updatedCards = [];
         let accountMap = {};
 
-        if (rawCards.length > 0) {
+        if (Array.isArray(rawCards) && rawCards.length > 0) {
           updatedCards = await Promise.all(
             rawCards.map(async (card) => {
               const targetAccountId = card.accountId || card.account?.id;
               
+              // Əgər kartın daxilində balans artıq varsa, əlavə API sorğusuna ehtiyac yoxdur
+              if (card.balance !== undefined && card.balance !== null) {
+                return card;
+              }
+
               if (targetAccountId) {
                 if (!accountMap[targetAccountId]) {
                   try {
                     const accountData = await accountService.getAccountById(targetAccountId);
                     accountMap[targetAccountId] = accountData;
                   } catch (accErr) {
-                    console.error(`Account ID ${targetAccountId} üçün detallar gətirilmədi:`, accErr);
+                    console.error(`Account ID ${targetAccountId} detal xətası:`, accErr);
                   }
                 }
 
@@ -128,7 +108,14 @@ export const DashboardPage = () => {
 
     fetchData();
     return () => window.removeEventListener('resize', handleResize);
-  }, [userId]);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('banking_token');
+    localStorage.removeItem('token');
+    localStorage.removeItem('banking_user');
+    navigate('/login');
+  };
 
   if (loading) return <LoadingSpinner />;
 
@@ -177,7 +164,7 @@ export const DashboardPage = () => {
           />
         </div>
 
-        {/* Bildiriş İkonu və Context-dən gələn Oxunmamış Sayı */}
+        {/* Bildiriş İkonu */}
         <button
           onClick={() => navigate('/notifications')}
           aria-label="Bildirişlər"
@@ -224,12 +211,7 @@ export const DashboardPage = () => {
         <LogOut
           size={20}
           style={{ color: '#e31e24', cursor: 'pointer' }}
-          onClick={() => {
-            localStorage.removeItem('banking_token');
-            localStorage.removeItem('token');
-            localStorage.removeItem('banking_user');
-            window.location.href = '/login';
-          }}
+          onClick={handleLogout}
         />
       </header>
 
@@ -321,7 +303,7 @@ export const DashboardPage = () => {
                   if (targetId) {
                     navigate(`/cards/${targetId}`);
                   } else {
-                    console.error("Kartın ID-si tapılmadı! Obyekt:", card);
+                    console.error("Kartın ID-si tapılmadı:", card);
                   }
                 }}
                 style={{
@@ -372,7 +354,7 @@ export const DashboardPage = () => {
 
                 <div style={{ textAlign: 'right' }}>
                   <span style={{ fontSize: '1rem', fontWeight: 'bold', color: '#212529' }}>
-                    {(card.balance || 0).toFixed(2)} ₼
+                    {Number(card.balance || 0).toFixed(2)} ₼
                   </span>
                 </div>
               </div>

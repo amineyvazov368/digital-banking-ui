@@ -3,7 +3,7 @@ import { Menu, Bell, Search, User, CheckCircle2, AlertTriangle, ExternalLink, X 
 import { useNavigate, Link } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 import { useNotification } from '../context/NotificationContext';
-import axios from 'axios';
+import api from '../services/api'; // Axios əvəzinə öz api instansiyamızı daxil edirik
 
 export const Navbar = ({ toggleSidebar, sidebarOpen, pageTitle = 'Dashboard' }) => {
   const { user } = useAuth();
@@ -15,14 +15,9 @@ export const Navbar = ({ toggleSidebar, sidebarOpen, pageTitle = 'Dashboard' }) 
   const { unreadCount, setUnreadCount, fetchUnreadCount } = useNotification();
 
   const fetchNotifications = async () => {
-    if (!user?.id) return;
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:8080/api/notifications?userId=${user.id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      // Backend token-dən istifadəçi id-sini özü götürdüyü üçün URL tam təmizdir
+      const response = await api.get('/api/notifications');
 
       let data = response.data;
       if (Array.isArray(data)) {
@@ -43,9 +38,8 @@ export const Navbar = ({ toggleSidebar, sidebarOpen, pageTitle = 'Dashboard' }) 
 
   useEffect(() => {
     fetchNotifications();
-  }, [user?.id]);
+  }, []);
 
-  // Düyməyə klikləyəndə işləyən rahat funksiya
   const handleBellClick = (e) => {
     e.stopPropagation();
     e.preventDefault();
@@ -65,12 +59,7 @@ export const Navbar = ({ toggleSidebar, sidebarOpen, pageTitle = 'Dashboard' }) 
     if (isAlreadyRead) return;
 
     try {
-      const token = localStorage.getItem('token');
-      await axios.put(`http://localhost:8080/api/notifications/${notification.id}/read`, {}, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      await api.put(`/api/notifications/${notification.id}/read`);
 
       setNotifications(prev =>
         prev.map(item =>
@@ -149,14 +138,11 @@ export const Navbar = ({ toggleSidebar, sidebarOpen, pageTitle = 'Dashboard' }) 
           {/* DROPDOWN & OVERLAY */}
           {notifDropdownOpen && (
             <>
-              {/* KƏNARA KLİKLƏMƏ ÜÇÜN BÜTÜN EKRANI ÖRTƏN ŞƏFFAF TƏBƏQƏ */}
-              {/* Həm mobil/planşet, həm desktop üçün kənara basanda pəncərəni bağlayır */}
               <div 
                 className="fixed inset-0 z-40 bg-slate-900/20 md:bg-transparent"
                 onClick={() => setNotifDropdownOpen(false)}
               />
 
-              {/* DROPDOWN PƏNCƏRƏSİ */}
               <div className="
                 fixed inset-x-4 top-20 max-h-[80vh]
                 md:absolute md:inset-auto md:right-0 md:top-full md:mt-2 md:max-h-none
