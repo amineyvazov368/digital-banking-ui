@@ -1,9 +1,11 @@
 // api.js
 import axios from 'axios';
+const RENDER_API_URL = 'https://digital-banking-api-2m78.onrender.com/api';
 
 const api = axios.create({
   // SƏNİN KODUN — Sadəcə baseURL-ə Vite mühit dəyişənini əlavə etdik:
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
+  
+  baseURL: import.meta.env.VITE_API_BASE_URL || RENDER_API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
