@@ -25,7 +25,7 @@ const NotificationsPage = () => {
     try {
       setLoading(true);
 
-      const res = await api.get(`/api/notification`);
+      const res = await api.get(`/api/notifications`);
 
       if (Array.isArray(res.data)) {
         setNotifications(res.data);
