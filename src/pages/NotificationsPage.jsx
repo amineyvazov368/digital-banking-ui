@@ -10,7 +10,7 @@ import {
 import { useNotification } from '../context/NotificationContext';
 import useAuth from '../hooks/useAuth';
 
-const API_URL = 'http://localhost:8080';
+const API_URL = import.meta.env.VITE_API_BASE_URL || 'https://digital-banking-api-2m78.onrender.com';
 
 const NotificationsPage = () => {
   const { user } = useAuth();
