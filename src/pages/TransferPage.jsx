@@ -8,7 +8,7 @@ import Select from '../components/Select';
 import Button from '../components/Button';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ConfirmDialog from '../components/ConfirmDialog';
-import { ArrowLeft, ArrowRightLeft, Send, ShieldCheck, User, CreditCard, AlertCircle,CheckCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRightLeft, Send, ShieldCheck, User, CreditCard, AlertCircle, CheckCircle, Copy, Check } from 'lucide-react';
 import transactionService from '../services/transactionService';
 
 export const TransferPage = () => {
@@ -24,6 +24,17 @@ export const TransferPage = () => {
   const [success, setSuccess] = useState('');
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  
+  // Test kartı kopyalamaq üçün steyt
+  const [copied, setCopied] = useState(false);
+  const testCardNo = '4169738817663965';
+
+  const handleCopyTestCard = () => {
+    setDestinationCardNumber(testCardNo);
+    navigator.clipboard.writeText(testCardNo);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const fetchUserCards = async () => {
     try {
@@ -69,7 +80,6 @@ export const TransferPage = () => {
     fetchUserCards();
   }, []);
 
-
   useEffect(() => {
     const cleanCardNo = destinationCardNumber.trim().replace(/\s+/g, '');
 
@@ -81,7 +91,6 @@ export const TransferPage = () => {
     const fetchRecipientOwner = async () => {
       setFetchingRecipient(true);
       try {
-        // Birbaşa yaratdığımız backend endpoint-ə müraciət edirik
         const res = await cardService.getCardOwnerByNumber(cleanCardNo);
 
         if (res && res.ownerFullName) {
@@ -172,15 +181,15 @@ export const TransferPage = () => {
     <div style={{
       width: '100%',
       minHeight: '100vh',
-      backgroundColor: '#f4f7f6', // Daha yumşaq fon rəngi
-      padding: 'clamp(1rem, 5vw, 3rem)', // Responsiv padding artırıldı
+      backgroundColor: '#f4f7f6',
+      padding: 'clamp(1rem, 5vw, 3rem)',
       boxSizing: 'border-box',
       display: 'flex',
       flexDirection: 'column',
-      gap: '1.5rem', // Elementlər arası məsafə artırıldı
-      maxWidth: '600px', // Bir az daha geniş, rahat görünüş
+      gap: '1.5rem',
+      maxWidth: '600px',
       margin: '0 auto',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif' // Sistem şriftləri
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
     }}>
       {/* Top Header Section */}
       <header style={{
@@ -189,8 +198,8 @@ export const TransferPage = () => {
         gap: '1rem',
         backgroundColor: '#ffffff',
         padding: '1.25rem',
-        borderRadius: '20px', // Daha yumru künclər
-        boxShadow: '0 10px 25px rgba(29, 52, 54, 0.05)', // Daha müasir, yumşaq kölgə
+        borderRadius: '20px',
+        boxShadow: '0 10px 25px rgba(29, 52, 54, 0.05)',
         border: '1px solid rgba(233, 236, 239, 0.6)'
       }}>
         <button
@@ -207,11 +216,9 @@ export const TransferPage = () => {
             justifyContent: 'center',
             cursor: 'pointer',
             flexShrink: 0,
-            transition: 'all 0.2s ease', // Hamar keçid
+            transition: 'all 0.2s ease',
             boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
           }}
-        // Hover effekti üçün javascript lazımdır, inline style ilə çətindir.
-        // Amma dizayn olaraq belə daha qəşəngdir.
         >
           <ArrowLeft size={22} color="#495057" />
         </button>
@@ -280,9 +287,6 @@ export const TransferPage = () => {
         )}
 
         <form onSubmit={handleValidateForm} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          {/* Qeyd: Select, Input və Button komponentlərinin daxili stillərini də
-          bu yeni dizayna uyğunlaşdırmağınız tövsiyə olunur (məsələn, border-radius: 12px, padding, border color).
-          Mən burada yalnız onların ətrafındakı layout-u idarə edirəm. */}
           <div>
             <Select
               label="Çıxarılacaq Kart"
@@ -290,7 +294,6 @@ export const TransferPage = () => {
               onChange={(e) => setSourceCardNumber(e.target.value)}
               options={cardOptions}
               required
-            // Komponentin stili varsa, bunları əlavə edin: borderRadius: '12px', borderColor: '#e0e6ed', padding: '12px'
             />
             {activeSource && (
               <div style={{
@@ -312,8 +315,42 @@ export const TransferPage = () => {
           </div>
 
           <div>
+            {/* Test üçün kart nömrəsi və Kopyalama bölməsi */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '0.4rem',
+              flexWrap: 'wrap',
+              gap: '0.3rem'
+            }}>
+              <span style={{ fontSize: '0.85rem', fontWeight: '600', color: '#485460' }}>
+                Qəbul Edənin Kart Nömrəsi
+              </span>
+              <div 
+                onClick={handleCopyTestCard}
+                title="Daxil etmək üçün klikləyin"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.3rem',
+                  fontSize: '0.78rem',
+                  backgroundColor: copied ? '#e6fffa' : '#f1f2f6',
+                  color: copied ? '#0be881' : '#57606f',
+                  border: `1px dashed ${copied ? '#0be881' : '#ced6e0'}`,
+                  padding: '0.2rem 0.5rem',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  userSelect: 'none'
+                }}
+              >
+                <span>Test: <strong>{testCardNo}</strong></span>
+                {copied ? <Check size={13} color="#0be881" /> : <Copy size={13} color="#57606f" />}
+              </div>
+            </div>
+
             <Input
-              label="Qəbul Edənin Kart Nömrəsi"
               type="text"
               inputMode="numeric"
               value={destinationCardNumber}
@@ -321,7 +358,6 @@ export const TransferPage = () => {
               placeholder="4165 XXXX XXXX XXXX"
               maxLength={16}
               required
-            // Komponentin stili varsa, bunları əlavə edin: borderRadius: '12px', borderColor: '#e0e6ed', padding: '12px'
             />
             {fetchingRecipient ? (
               <div style={{ fontSize: '0.8rem', color: '#868e96', marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
@@ -356,7 +392,6 @@ export const TransferPage = () => {
             onChange={(e) => setAmount(e.target.value)}
             placeholder="0.00"
             required
-          // Komponentin stili varsa, bunları əlavə edin: borderRadius: '12px', borderColor: '#e0e6ed', padding: '12px', fontSize: '1.1rem', fontWeight: '600'
           />
 
           <Button
@@ -365,15 +400,15 @@ export const TransferPage = () => {
             style={{
               width: '100%',
               padding: '1rem',
-              borderRadius: '16px', // Daha yumru
-              backgroundColor: submitting ? '#fab1a0' : '#ff4757', // Daha müasir qırmızı
+              borderRadius: '16px',
+              backgroundColor: submitting ? '#fab1a0' : '#ff4757',
               color: '#ffffff',
               fontWeight: '700',
               fontSize: '1.05rem',
               border: 'none',
               cursor: submitting ? 'not-allowed' : 'pointer',
               marginTop: '1rem',
-              boxShadow: submitting ? 'none' : '0 6px 20px rgba(255, 71, 87, 0.3)', // Daha canlı kölgə
+              boxShadow: submitting ? 'none' : '0 6px 20px rgba(255, 71, 87, 0.3)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -395,7 +430,7 @@ export const TransferPage = () => {
 
       {/* Security Banner */}
       <div style={{
-        backgroundColor: '#ffffff', // Tünd qırmızı fon yerinə ağ fon
+        backgroundColor: '#ffffff',
         border: '1px solid #e9ecef',
         borderRadius: '20px',
         padding: '1.25rem',
@@ -419,7 +454,7 @@ export const TransferPage = () => {
             3D Secure Təhlükəsizlik
           </h4>
           <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#747d8c', lineHeight: '1.4' }}>
-            Bütün əməliyyatlar meynəlxalq təhlükəsizlik standartlarına uyğun şifrələnir.
+            Bütün əməliyyatlar beynəlxalq təhlükəsizlik standartlarına uyğun şifrələnir.
           </p>
         </div>
       </div>
@@ -431,16 +466,14 @@ export const TransferPage = () => {
         title="Köçürməni Təsdiqləyin"
         confirmText="Bəli, Göndər"
         cancelText="Ləğv et"
-        // Message hissəsini də ConfirmDialog daxilində daha qəşəng stilləndirmək olar
         message={`${recipientName ? `${recipientName} (${destinationCardNumber})` : destinationCardNumber} kartına ₼${amount} məbləğində köçürmə etmək istədiyinizdən əminsiniz?`}
       />
 
-      {/* Spinner üçün CSS animation (əgər global CSS-inizdə yoxdursa) */}
       <style>{`
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-  `}</style>
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 };

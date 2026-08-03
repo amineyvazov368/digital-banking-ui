@@ -1,44 +1,33 @@
-import axios from 'axios';
-
-const API_URL = 'http://localhost:8080/api/admin/cards';
-
-const api = axios.create({
-  baseURL: API_URL,
-});
-
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token'); 
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+// adminCardService.js
+import api from './api';
 
 export const adminCardService = {
   getAllCards: async () => {
-    const response = await api.get('');
+    const response = await api.get('/api/admin/cards');
     return response.data;
   },
 
   activateCard: async (cardId, userId) => {
     // Backend @RequestParam Long userId gözlədiyi üçün params daxilində göndəririk
-    const response = await api.patch(`/${cardId}/activate`, {}, {
+    const response = await api.patch(`/api/admin/cards/${cardId}/activate`, {}, {
       params: { userId }
     });
     return response.data;
   },
 
   blockCard: async (cardId, userId) => {
-    const response = await api.patch(`/${cardId}/block`, {}, {
+    const response = await api.patch(`/api/admin/cards/${cardId}/block`, {}, {
       params: { userId }
     });
     return response.data;
   },
 
   deleteCard: async (cardId, userId) => {
-    const response = await api.delete(`/${cardId}`, {
+    const response = await api.delete(`/api/admin/cards/${cardId}`, {
       params: { userId }
     });
     return response.data;
   }
 };
+
+export default adminCardService;

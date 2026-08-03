@@ -38,7 +38,6 @@ const AdminCredit = () => {
         setPage(0);
     };
 
-    // Tarix formatı üçün köməkçi funksiya
     const formatDate = (dateString) => {
         if (!dateString) return '-';
         return new Date(dateString).toLocaleDateString('az-AZ', {
@@ -50,13 +49,11 @@ const AdminCredit = () => {
         });
     };
 
-    // Məbləğ formatı üçün köməkçi funksiya
     const formatCurrency = (val) => {
         if (val === null || val === undefined) return '0.00 ₼';
         return `${Number(val).toLocaleString('az-AZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₼`;
     };
 
-    // Status dizaynı üçün köməkçi funksiya
     const getStatusBadge = (status) => {
         switch (status) {
             case 'ACTIVE':

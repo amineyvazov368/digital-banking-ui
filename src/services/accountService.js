@@ -1,3 +1,4 @@
+// accountService.js
 import api from './api';
 
 export const accountService = {
@@ -6,7 +7,7 @@ export const accountService = {
       const response = await api.get('/api/accounts', {
         params: userId ? { userId } : {} 
       });
-      return response.data || response;
+      return response.data;
     } catch (error) {
       console.error('Hesablar yüklənərkən xəta baş verdi:', error.message);
       throw error; 
@@ -53,7 +54,6 @@ export const accountService = {
     }
   },
 
-  // BACKEND-DƏKİ @PatchMapping("/{accountId}/close") ENDPOINT-İ
   closeAccount: async (accountId) => {
     try {
       const response = await api.patch(`/api/accounts/${accountId}/close`);

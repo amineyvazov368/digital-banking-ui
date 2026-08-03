@@ -1,3 +1,4 @@
+// authService.js
 import api from './api';
 
 export const authService = {
@@ -26,20 +27,8 @@ export const authService = {
     return response.data;
   },
 
-  // getCurrentUser: async () => {
-  //   try {
-  //     // Backend-dən cari istifadəçi məlumatlarını çəkmək
-  //     const response = await api.get('/api/users/me');
-  //     return response.data;
-  //   } catch (err) {
-  //     console.warn("Backend unavailable, fetching from LocalStorage");
-  //     const user = localStorage.getItem('banking_user');
-  //     return user ? JSON.parse(user) : null;
-  //   }
-  // },
-
   getCurrentUser: async () => {
-    // Backend-də /api/users/me olmadığı üçün birbaşa LocalStorage-dən götürürük
+    // LocalStorage-dən cari istifadəçini götürürük
     const user = localStorage.getItem('banking_user');
     return user ? JSON.parse(user) : null;
   },
@@ -47,7 +36,6 @@ export const authService = {
   // Profile Məlumatlarını Yeniləmək
   updateProfile: async (profileData) => {
     try {
-      // Backend DTO formatına uyğun: name, surname, email
       const payload = {
         name: profileData.firstName,
         surname: profileData.lastName,
@@ -56,7 +44,7 @@ export const authService = {
 
       const response = await api.put('/api/users/me', payload);
       
-      // Local storage-i da sinxronlaşdıraq
+      // Local storage-i sinxronlaşdıraq
       const currentUser = JSON.parse(localStorage.getItem('banking_user') || '{}');
       const updatedUser = { ...currentUser, ...payload };
       localStorage.setItem('banking_user', JSON.stringify(updatedUser));
@@ -90,13 +78,10 @@ export const authService = {
     }
   },
 
-  logout: async (token) => {
+  logout: async () => {
     try {
-      await api.post('/api/users/logout', {}, {
-        headers: {
-          'Authorization': `Bearer ${token || localStorage.getItem('banking_token')}`
-        }
-      });
+      // api.js avtomatik Bearer token-i əlavə etdiyi üçün manual header yazmağa gərək yoxdur
+      await api.post('/api/users/logout', {});
     } catch (err) {
       console.error("Logout failed on backend", err);
     }

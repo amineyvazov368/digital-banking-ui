@@ -7,7 +7,6 @@ const API_URL = 'http://localhost:8080';
 export const NotificationProvider = ({ children, userId }) => {
   const [unreadCount, setUnreadCount] = useState(0);
 
-  // useCallback istifadə edirik ki, funksiya hər dəfə yenidən yaranmasın
   const fetchUnreadCount = useCallback(async () => {
     if (!userId) {
       setUnreadCount(0);
@@ -31,15 +30,13 @@ export const NotificationProvider = ({ children, userId }) => {
   }, [userId]);
 
   useEffect(() => {
-    // 1. İlk dəfə yüklenende çağırır
     fetchUnreadCount();
 
-    // 2. Hər 5 saniyədən bir arxa fonda avtomatik yoxlayır (Polling)
+    
     const interval = setInterval(() => {
       fetchUnreadCount();
-    }, 5000); // 5000ms = 5 saniyə
+    }, 5000); 
 
-    // Cleanup: Komponent silindikdə intervalı təmizləyirik
     return () => clearInterval(interval);
   }, [fetchUnreadCount]);
 

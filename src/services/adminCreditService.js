@@ -1,5 +1,4 @@
-// src/services/adminCreditService.js  (və ya src/pages/admin/adminCreditService.js)
-import api from './api'; // Layihənizdəki mövcud axios instance-ı çağırın
+import api from './api'; 
 
 export const fetchAllCredits = async (page = 0, size = 10) => {
     const response = await api.get(`/api/admin/credit?page=${page}&size=${size}`);

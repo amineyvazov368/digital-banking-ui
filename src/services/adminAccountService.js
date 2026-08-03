@@ -1,6 +1,7 @@
-import api from './api'; // api.js faylının nisbi yolunu (path) düzgün yazın
+// adminAccountService.js
+import api from './api';
 
-const adminAccountService = {
+export const adminAccountService = {
   getAllAccounts: async () => {
     const response = await api.get('/api/admin/accounts'); 
     return response.data;

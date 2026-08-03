@@ -6,7 +6,6 @@ import useAuth from './hooks/useAuth';
 import AppRoutes from './routes/routes';
 import './App.css';
 
-// NotificationProvider-ə userId ötürmək üçün daxili wrapper komponent
 const AppContent = () => {
   const { user } = useAuth();
 

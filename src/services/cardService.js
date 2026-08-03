@@ -1,3 +1,4 @@
+// cardService.js
 import api from './api';
 
 const MOCK_STORAGE_KEY = 'banking_mock_cards';
@@ -16,14 +17,11 @@ const initializeMockCards = () => {
 };
 
 export const cardService = {
-  // 0. Yeni Əlavə: Kart Nömrəsinə görə kartı və ya kart sahibinin adını gətirir
-  // cardService.js daxilində
+  // 0. Kart Nömrəsinə görə kartı və ya kart sahibinin adını gətirir
   getCardByNumber: async (cardNumber) => {
-    const token = localStorage.getItem('token') || localStorage.getItem('banking_token');
     try {
-      const response = await api.get(`/api/cards/number/${cardNumber}`, {
-        headers: { Authorization: token ? `Bearer ${token}` : '' }
-      });
+      // api.js avtomatik Authorization header-ini əlavə edir
+      const response = await api.get(`/api/cards/number/${cardNumber}`);
       return response.data;
     } catch (error) {
       console.warn('Backend unavailable or 403 Forbidden, searching in mock cards:', cardNumber);
@@ -42,11 +40,8 @@ export const cardService = {
   },
 
   getCardOwnerByNumber: async (cardNumber) => {
-    const token = localStorage.getItem('token') || localStorage.getItem('banking_token');
     try {
-      const response = await api.get(`/api/cards/owner/${cardNumber}`, {
-        headers: { Authorization: token ? `Bearer ${token}` : '' }
-      });
+      const response = await api.get(`/api/cards/owner/${cardNumber}`);
       return response.data; // { cardNumber: "...", ownerFullName: "Ad Soyad" } qaytarır
     } catch (error) {
       console.warn('Kart sahibi tapılmadı:', error);

@@ -2,13 +2,14 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080',
+  // SƏNİN KODUN — Sadəcə baseURL-ə Vite mühit dəyişənini əlavə etdik:
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Request interceptor: Tokeni həm 'banking_token', həm də 'token' açarı ilə axtarırıq
+// Request interceptor: Sənin öz orijinal kodun (TOXUNULMADI)
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('banking_token') || localStorage.getItem('token');
