@@ -115,6 +115,7 @@ export const DashboardPage = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('banking_user');
     navigate('/login');
+    window.location.href = '/login';
   };
 
   if (loading) return <LoadingSpinner />;
