@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import api from '../api/api'; // api.js faylınızın yolunu düzgün göstərin
+import api from '../services/api'; // api.js faylınızın yolunu düzgün göstərin
 import { 
   Bell, 
   CheckCircle2, 

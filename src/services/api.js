@@ -17,7 +17,11 @@ api.interceptors.request.use(
     if (token && token !== 'undefined' && token !== 'null') {
       config.headers.Authorization = `Bearer ${token}`;
     } else {
-      console.warn("Diqqət: Backend-ə göndərilməyə Authorization Token tapılmadı!");
+      const isAuthRequest = config.url.includes('/login') || config.url.includes('/register');
+      
+      if (!isAuthRequest) {
+        console.warn("Diqqət: Backend-ə göndərilməyə Authorization Token tapılmadı!");
+      }
     }
     return config;
   },

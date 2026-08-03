@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import authService from '../services/authService';
+import api from '../services/api'; // 🟢 1. BURADA ÖZ AXIOS INSTANCE-İNİ IMPORT ET
 
 export const AuthContext = createContext(null);
 
@@ -19,16 +20,20 @@ export const AuthProvider = ({ children }) => {
         if (storedToken && storedUser && storedUser !== "undefined") {
           setToken(storedToken);
           setUser(JSON.parse(storedUser));
+
+          // 🟢 2. SƏHİFƏ REFRES S OLANDA DA AXIOS-A TOKENİ VERİRİK:
+          api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
         } else {
           // Əgər yarımçıq və ya xarab data qalıbsa, təmizləyirik
           localStorage.removeItem('banking_token');
           localStorage.removeItem('banking_user');
+          delete api.defaults.headers.common['Authorization'];
         }
       } catch (error) {
         console.error("Error parsing stored user data:", error);
-        // Hər hansı xəta olduqda tətbiqin çökməməsi üçün yaddaşı sıfırlayırıq
         localStorage.removeItem('banking_token');
         localStorage.removeItem('banking_user');
+        delete api.defaults.headers.common['Authorization'];
       } finally {
         setLoading(false);
       }
@@ -38,40 +43,44 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-  setLoading(true);
-  try {
-    const data = await authService.login(email, password);
-    
-    const { userResponseDto, accessToken } = data;
-
-    if (accessToken && userResponseDto) {
+    setLoading(true);
+    try {
+      const data = await authService.login(email, password);
       
-      const userId = userResponseDto.id || userResponseDto.userId || data.id || data.userId;
-      
-      const userToSave = {
-        ...userResponseDto,
-        id: userId
-      };
+      const { userResponseDto, accessToken } = data;
 
-      console.log("Giriş uğurludur! Saxlanılan User:", userToSave);
+      if (accessToken && userResponseDto) {
+        
+        const userId = userResponseDto.id || userResponseDto.userId || data.id || data.userId;
+        
+        const userToSave = {
+          ...userResponseDto,
+          id: userId
+        };
 
-      localStorage.setItem('banking_token', accessToken);
-      localStorage.setItem('banking_user', JSON.stringify(userToSave));
-      
-      setToken(accessToken);
-      setUser(userToSave);
+        console.log("Giriş uğurludur! Saxlanılan User:", userToSave);
 
-      // SƏHİFƏYƏ ROL VƏ İD İLƏ BİRLİKDƏ TAM OBYEKTİ QAYTARIRIQ:
-      return userToSave; 
-    } else {
-      throw new Error("Invalid response structure from server");
+        localStorage.setItem('banking_token', accessToken);
+        localStorage.setItem('banking_user', JSON.stringify(userToSave));
+        
+        // 🟢 3. LOGIN OLAN KİMİ ANINDA AXIOS-A TOKEN-İ SET EDİRİK (403 verməməsi üçün):
+        api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+
+        setToken(accessToken);
+        setUser(userToSave);
+
+        // SƏHİFƏYƏ ROL VƏ İD İLƏ BİRLİKDƏ TAM OBYEKTİ QAYTARIRIQ:
+        return userToSave; 
+      } else {
+        throw new Error("Invalid response structure from server");
+      }
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    throw error;
-  } finally {
-    setLoading(false);
-  }
-};
+  };
+
   const register = async (registerData) => {
     setLoading(true);
     try {
@@ -87,14 +96,16 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     setLoading(true);
     try {
-      // Backend-ə çıxış sorğusu göndəririk (əgər reallaşdırılıbsa)
       await authService.logout();
     } catch (error) {
       console.error('Logout API error:', error);
     } finally {
-      // Hər bir halda brauzerdəki məlumatları təmizləyirik
       localStorage.removeItem('banking_token');
       localStorage.removeItem('banking_user');
+      
+      // 🟢 4. LOGOUT OLANDA AXIOS-DAN TOKENİ SİLİRİK:
+      delete api.defaults.headers.common['Authorization'];
+
       setToken(null);
       setUser(null);
       setLoading(false);
@@ -105,7 +116,7 @@ export const AuthProvider = ({ children }) => {
     user,
     token,
     loading,
-    isAuthenticated: !!token, // Token varsa true, yoxdursa false qaytarır
+    isAuthenticated: !!token,
     login,
     register,
     logout
