@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../api/api'; // api.js faylınızın yolunu düzgün göstərin
 import { 
   Bell, 
   CheckCircle2, 
@@ -9,8 +9,6 @@ import {
 } from 'lucide-react';
 import { useNotification } from '../context/NotificationContext';
 import useAuth from '../hooks/useAuth';
-
-const API_URL = import.meta.env.VITE_API_BASE_URL || 'https://digital-banking-api-2m78.onrender.com';
 
 const NotificationsPage = () => {
   const { user } = useAuth();
@@ -26,13 +24,8 @@ const NotificationsPage = () => {
 
     try {
       setLoading(true);
-      const token = localStorage.getItem('token'); 
 
-      const res = await axios.get(`${API_URL}/api/notifications?userId=${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      const res = await api.get(`/api/notifications?userId=${userId}`);
 
       if (Array.isArray(res.data)) {
         setNotifications(res.data);
@@ -62,13 +55,7 @@ const NotificationsPage = () => {
     if (isAlreadyRead) return;
 
     try {
-      const token = localStorage.getItem('token');
-
-      await axios.put(`${API_URL}/api/notifications/${notification.id}/read`, {}, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      await api.put(`/api/notifications/${notification.id}/read`);
 
       setNotifications(prev =>
         (Array.isArray(prev) ? prev : []).map(item =>
@@ -86,12 +73,7 @@ const NotificationsPage = () => {
 
   const handleDelete = async (id) => {
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`${API_URL}/api/notifications/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      await api.delete(`/api/notifications/${id}`);
       setNotifications(prev => prev.filter(n => n.id !== id));
       if (fetchUnreadCount) fetchUnreadCount();
     } catch (err) {

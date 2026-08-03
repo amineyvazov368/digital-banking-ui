@@ -1,8 +1,7 @@
 import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
-import axios from 'axios';
+import api from '../api/api'; // api.js faylınızın yolunu düzgün göstərin
 
 const NotificationContext = createContext();
-const API_URL = import.meta.env.VITE_API_BASE_URL || 'https://digital-banking-api-2m78.onrender.com';
 
 export const NotificationProvider = ({ children, userId }) => {
   const [unreadCount, setUnreadCount] = useState(0);
@@ -13,14 +12,8 @@ export const NotificationProvider = ({ children, userId }) => {
       return;
     }
     try {
-      const token = localStorage.getItem('token');
-      if (!token) return;
-
-      const response = await axios.get(`${API_URL}/api/notifications/unread-count?userId=${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      // api.js artıq Token və BaseURL-i özü idarə edir
+      const response = await api.get(`/api/notifications/unread-count?userId=${userId}`);
       
       const count = typeof response.data === 'object' ? response.data.count : response.data;
       setUnreadCount(count || 0);
@@ -32,7 +25,6 @@ export const NotificationProvider = ({ children, userId }) => {
   useEffect(() => {
     fetchUnreadCount();
 
-    
     const interval = setInterval(() => {
       fetchUnreadCount();
     }, 5000); 
