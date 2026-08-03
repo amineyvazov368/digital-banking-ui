@@ -6,10 +6,10 @@ export const authService = {
     const response = await api.post('/api/users/login', { email, password });
     // Əgər token response.data.token və ya oxşar gəlirsə:
     const token = response.data?.token || response.data?.accessToken || response.data;
-    if (typeof token === 'string') {
-      localStorage.setItem('banking_token', token);
-      localStorage.setItem('token', token); // Hər iki ehtimal üçün
-    }
+   if (token) {
+    localStorage.setItem('banking_token', token);
+    localStorage.setItem('token', token);
+  }
     return response.data; 
   },
 

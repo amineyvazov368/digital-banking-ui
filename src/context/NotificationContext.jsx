@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
-import api from '../services/api'; // api.js faylınızın yolunu düzgün göstərin
+import api from '../services/api'; 
 
 const NotificationContext = createContext();
 
@@ -13,7 +13,7 @@ export const NotificationProvider = ({ children, userId }) => {
     }
     try {
       // api.js artıq Token və BaseURL-i özü idarə edir
-      const response = await api.get(`/api/notifications/unread-count?userId=${userId}`);
+      const response = await api.get(`/api/notifications/unread-count`);
       
       const count = typeof response.data === 'object' ? response.data.count : response.data;
       setUnreadCount(count || 0);
