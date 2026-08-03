@@ -2,7 +2,7 @@ import React, { createContext, useState, useEffect, useContext, useCallback } fr
 import axios from 'axios';
 
 const NotificationContext = createContext();
-const API_URL = 'http://localhost:8080';
+const API_URL = import.meta.env.VITE_API_BASE_URL || 'https://digital-banking-api-2m78.onrender.com';
 
 export const NotificationProvider = ({ children, userId }) => {
   const [unreadCount, setUnreadCount] = useState(0);
