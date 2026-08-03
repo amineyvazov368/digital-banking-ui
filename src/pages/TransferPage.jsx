@@ -27,7 +27,7 @@ export const TransferPage = () => {
   
   // Test kartı kopyalamaq üçün steyt
   const [copied, setCopied] = useState(false);
-  const testCardNo = '4169738817663965';
+  const testCardNo = '4169738815693614';
 
   const handleCopyTestCard = () => {
     setDestinationCardNumber(testCardNo);

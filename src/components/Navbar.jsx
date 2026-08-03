@@ -97,7 +97,7 @@ export const Navbar = ({ toggleSidebar, sidebarOpen, pageTitle = 'Dashboard' }) 
           className="p-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors shrink-0"
           title="Menyunu dəyiş"
         >
-          <Menu size={22} />
+          {/* <Menu size={22} /> */}
         </button>
         
         <h1 className="text-base sm:text-lg font-bold text-slate-800 tracking-tight truncate">

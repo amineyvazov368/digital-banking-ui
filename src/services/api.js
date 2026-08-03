@@ -18,7 +18,6 @@ api.interceptors.request.use(
     
     if (token && token !== 'undefined' && token !== 'null') {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log("Göndərilən Header:", config.headers.Authorization);
     } else {
       const isAuthRequest = config.url.includes('/login') || config.url.includes('/register');
       

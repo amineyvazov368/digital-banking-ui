@@ -79,29 +79,41 @@ export const CardsPage = () => {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="page-container" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+    <div className="page-container" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '100%', boxSizing: 'border-box' }}>
+      {/* Header Container */}
       <div style={{
         display: 'flex',
-        justify: 'space-between',
+        justifyContent: 'space-between',
         alignItems: 'center',
         flexWrap: 'wrap',
-        gap: '1rem'
+        gap: '1rem',
+        width: '100%'
       }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem', flex: '1 1 250px' }}>
           <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Credit & Debit Cards</span>
           <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>Manage statuses, card security controls and limits.</span>
         </div>
-        <Button 
-          variant="primary" 
-          onClick={() => navigate('/cards/create')}
-          icon={Plus}
-        >
-          Order Digital Card
-        </Button>
+        
+        <div style={{ width: '100%', maxWidth: 'max-content' }} className="mobile-full-width">
+          <Button 
+            variant="primary" 
+            onClick={() => navigate('/cards/create')}
+            icon={Plus}
+            style={{ width: '100%' }}
+          >
+            Order Digital Card
+          </Button>
+        </div>
       </div>
 
+      {/* Cards List / Grid */}
       {cards && cards.length > 0 ? (
-        <div className="grid-cols-2">
+        <div className="grid-cols-2" style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
+          gap: '1.25rem',
+          width: '100%'
+        }}>
           {cards.map((card, index) => {
             const currentId = card.id || card.cardId || index;
             return (
@@ -115,18 +127,23 @@ export const CardsPage = () => {
           })}
         </div>
       ) : (
+        /* Empty State */
         <div className="glass-card" style={{
           textAlign: 'center',
-          padding: '4rem 2rem',
+          padding: ' clamp(2rem, 5vw, 4rem) 1.5rem',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: '1rem'
+          gap: '1rem',
+          width: '100%',
+          boxSizing: 'border-box'
         }}>
           <Info size={40} style={{ color: 'var(--text-muted)' }} />
-          <div>
+          <div style={{ maxWidth: '400px' }}>
             <h4 style={{ color: '#fff', fontSize: '1.1rem', marginBottom: '0.25rem' }}>No cards issued</h4>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Securely issue digital or physical cards linked to your reserve accounts.</p>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.4' }}>
+              Securely issue digital or physical cards linked to your reserve accounts.
+            </p>
           </div>
           <Button variant="primary" onClick={() => navigate('/cards/create')}>
             Issue Card
